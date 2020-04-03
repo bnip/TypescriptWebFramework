@@ -8,16 +8,16 @@ export class Eventing {
   // And the keys will point to values that are an array of Callback functions
   events: { [key: string]: Callback[] } = {};
   // () => void as a prop tells typescript that the passed in parameter is a function
-  on(eventName: string, callback: Callback) {
+  on = (eventName: string, callback: Callback) => {
     // This will fall back on [] if we get undefined
     // This guarantees handlers will be an array
     const handlers = this.events[eventName] || [];
     handlers.push(callback);
     // Assign array back to event in events
     this.events[eventName] = handlers;
-  }
+  };
 
-  trigger(eventName: string): void {
+  trigger = (eventName: string): void => {
     const handlers = this.events[eventName];
 
     if (!handlers || handlers.length === 0) {
@@ -27,5 +27,5 @@ export class Eventing {
     handlers.forEach((callback) => {
       callback();
     });
-  }
+  };
 }

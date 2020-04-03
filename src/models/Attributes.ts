@@ -8,12 +8,17 @@ export class Attributes<T> {
   // T[K] is a normal object lookup
   // const colors = {red: 'red'}
   // colors['red'] returns 'red'
-  get<K extends keyof T>(key: K): T[K] {
+  get = <K extends keyof T>(key: K): T[K] => {
+    // since this is an arrow function this is always bound to the instance of attribute
     return this.data[key];
-  }
+  };
 
   set(update: T): void {
     // Overwrites this.data with the passed in data of type UserProps
     Object.assign(this.data, update);
+  }
+
+  getAll(): T {
+    return this.data;
   }
 }
