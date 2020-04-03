@@ -29,17 +29,23 @@ export class Model<T extends HasId> {
 
   // We are not trying to call a function right here.
   // Instead we are trying to return a reference to the events.on() method
-  get on() {
-    return this.events.on;
-  }
+  // get on() {
+  //   return this.events.on;
+  // }
 
-  get trigger() {
-    return this.events.trigger;
-  }
+  on = this.events.on;
 
-  get get() {
-    return this.attributes.get;
-  }
+  // get trigger() {
+  //   return this.events.trigger;
+  // }
+
+  trigger = this.events.trigger;
+
+  // get get() {
+  //   return this.attributes.get;
+  // }
+
+  get = this.attributes.get;
 
   set(update: T): void {
     this.attributes.set(update);
