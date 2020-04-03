@@ -117,7 +117,50 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
+})({"src/models/Eventing.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Eventing =
+/** @class */
+function () {
+  function Eventing() {
+    // We don't know the names of the events being passed in
+    // So we use [key: string] to tell typescript that the keys are strings
+    // And the keys will point to values that are an array of Callback functions
+    this.events = {};
+  } // () => void as a prop tells typescript that the passed in parameter is a function
+
+
+  Eventing.prototype.on = function (eventName, callback) {
+    // This will fall back on [] if we get undefined
+    // This guarantees handlers will be an array
+    var handlers = this.events[eventName] || [];
+    handlers.push(callback); // Assign array back to event in events
+
+    this.events[eventName] = handlers;
+  };
+
+  Eventing.prototype.trigger = function (eventName) {
+    var handlers = this.events[eventName];
+
+    if (!handlers || handlers.length === 0) {
+      return;
+    }
+
+    handlers.forEach(function (callback) {
+      callback();
+    });
+  };
+
+  return Eventing;
+}();
+
+exports.Eventing = Eventing;
+},{}],"node_modules/axios/lib/helpers/bind.js":[function(require,module,exports) {
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -1880,8 +1923,8 @@ module.exports.default = axios;
 
 },{"./utils":"node_modules/axios/lib/utils.js","./helpers/bind":"node_modules/axios/lib/helpers/bind.js","./core/Axios":"node_modules/axios/lib/core/Axios.js","./core/mergeConfig":"node_modules/axios/lib/core/mergeConfig.js","./defaults":"node_modules/axios/lib/defaults.js","./cancel/Cancel":"node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"node_modules/axios/lib/cancel/isCancel.js","./helpers/spread":"node_modules/axios/lib/helpers/spread.js"}],"node_modules/axios/index.js":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"node_modules/axios/lib/axios.js"}],"src/index.ts":[function(require,module,exports) {
-"use strict"; // import { User } from './models/User';
+},{"./lib/axios":"node_modules/axios/lib/axios.js"}],"src/models/Sync.ts":[function(require,module,exports) {
+"use strict";
 
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
@@ -1891,23 +1934,85 @@ var __importDefault = this && this.__importDefault || function (mod) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
-}); // const user = new User({ name: 'myName', age: 20 });
-// user.on('change', () => {
-//   console.log('Change #1');
-// });
-// user.on('change', () => {
-//   console.log('Change #2');
-// });
-// console.log(user);
+});
 
 var axios_1 = __importDefault(require("axios"));
 
-axios_1.default.post('http://localhost:3000/users', {
-  name: 'myname',
-  age: 20
+var Sync =
+/** @class */
+function () {
+  function Sync(rootUrl) {
+    this.rootUrl = rootUrl;
+  }
+
+  Sync.prototype.fetch = function (id) {
+    return axios_1.default.get(this.rootUrl + "/" + id);
+  };
+
+  Sync.prototype.save = function (data) {
+    var id = data;
+
+    if (id) {
+      // put
+      axios_1.default.put(this.rootUrl + "/" + id, data);
+    } else {
+      // post
+      axios_1.default.post(this.rootUrl + "/", data);
+    }
+  };
+
+  return Sync;
+}();
+
+exports.Sync = Sync;
+},{"axios":"node_modules/axios/index.js"}],"src/models/User.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
-axios_1.default.get('http://localhost:3000/users/1');
-},{"axios":"node_modules/axios/index.js"}],"../../../.nvm/versions/node/v13.6.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+var Eventing_1 = require("./Eventing");
+
+var Sync_1 = require("./Sync");
+
+new Sync_1.Sync('http://localhost:3000/users');
+
+var User =
+/** @class */
+function () {
+  function User(data) {
+    this.data = data;
+    this.eventing = new Eventing_1.Eventing();
+  }
+
+  User.prototype.get = function (propName) {
+    return this.data[propName];
+  };
+
+  User.prototype.set = function (update) {
+    // Overwrites this.data with the passed in data of type UserProps
+    Object.assign(this.data, update);
+  };
+
+  return User;
+}();
+
+exports.User = User;
+},{"./Eventing":"src/models/Eventing.ts","./Sync":"src/models/Sync.ts"}],"src/index.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var User_1 = require("./models/User");
+
+var user = new User_1.User({
+  name: 'new record',
+  age: 0
+});
+},{"./models/User":"src/models/User.ts"}],"../../../.nvm/versions/node/v13.6.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
