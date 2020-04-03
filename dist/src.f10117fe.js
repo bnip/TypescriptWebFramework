@@ -1950,7 +1950,7 @@ function () {
   };
 
   Sync.prototype.save = function (data) {
-    var id = data;
+    var id = data.id;
 
     if (id) {
       // put
@@ -1976,7 +1976,7 @@ var Eventing_1 = require("./Eventing");
 
 var Sync_1 = require("./Sync");
 
-new Sync_1.Sync('http://localhost:3000/users');
+var rooturl = 'http://localhost:3000/users';
 
 var User =
 /** @class */
@@ -1984,6 +1984,7 @@ function () {
   function User(data) {
     this.data = data;
     this.eventing = new Eventing_1.Eventing();
+    this.sync = new Sync_1.Sync(rooturl);
   }
 
   User.prototype.get = function (propName) {

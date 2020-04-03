@@ -1,21 +1,24 @@
 import axios, { AxiosPromise } from 'axios';
 import { UserProps } from './User';
 
-export class Sync {
+// Type constraint to allow us to get id prop from data (generic)
+interface HasId {
+  id?: number;
+}
+
+export class Sync<T extends HasId> {
   constructor(public rootUrl: string) {}
   fetch(id: number): AxiosPromise {
     return axios.get(`${this.rootUrl}/${id}`);
   }
 
-  save(data: UserProps): void {
-    const id = data;
+  save(data: T): AxiosPromise {
+    const { id } = data;
 
     if (id) {
-      // put
-      axios.put(`${this.rootUrl}/${id}`, data);
+      return axios.put(`${this.rootUrl}/${id}`, data);
     } else {
-      // post
-      axios.post(`${this.rootUrl}/`, data);
+      return axios.post(this.rootUrl, data);
     }
   }
 }

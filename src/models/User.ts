@@ -1,8 +1,6 @@
 import { Eventing } from './Eventing';
 import { Sync } from './Sync';
 
-new Sync('http://localhost:3000/users');
-
 export interface UserProps {
   // By adding question marks we make the properties optional.
   // This gives us the flexiblity to update only one property if we wanted to
@@ -11,8 +9,12 @@ export interface UserProps {
   age?: number;
 }
 
+const rooturl = 'http://localhost:3000/users';
+
 export class User {
   public eventing: Eventing = new Eventing();
+  public sync: Sync<UserProps> = new Sync<UserProps>(rooturl);
+
   constructor(private data: UserProps) {}
 
   get(propName: string): number | string {
